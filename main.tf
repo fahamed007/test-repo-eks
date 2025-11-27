@@ -4,7 +4,11 @@ variable "basename" {
   # There should be no default for this variable.
   default = "firoj"
 }
-
+variable "eks_node_ami_id" {
+  type        = string
+  description = "AMI ID for the EKS Node.  If this value is not specified, befault to latest EKS AMI ID.  May force replacement after node group has been created - so beware."
+  default     = ""
+}
 variable "asg_scaledown" {
   default     = "0 22 * * 1-5"
   description = "Cron string to set scaledown period"
