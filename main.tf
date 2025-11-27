@@ -569,7 +569,7 @@ locals {
 data "aws_ami" "nodegroup_ami" {
   filter {
     name   = "image-id"
-    values = [var.nodegroup_image_id]
+    values = [local.nodegroup_image_id]
   }
 }
 
@@ -608,7 +608,7 @@ resource "aws_launch_template" "nodegroup_launchtemplate" {
 
 
 
-  image_id      = var.nodegroup_image_id
+  image_id      = local.nodegroup_image_id
   instance_type = var.nodegroup_instance_type
   key_name      = var.nodegroup_key_name
 
