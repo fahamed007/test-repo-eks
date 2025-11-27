@@ -6,6 +6,16 @@ variable "basename" {
 }
 
 
+variable "aws_region" {
+  type        = string
+  description = "AWS Region name"
+  # There should be no default for this variable.
+  default ="ap-south-1"
+}
+
+
+
+
 resource "aws_key_pair" "infra" {
   key_name   = "${var.basename}_nodegroup_ssh_key"
   public_key = var.ssh_public_key
@@ -20,7 +30,7 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 
 
 module "aws_eks_cluster" {
-  source              = "../../modules/aws/eks_cluster"
+  source              = "./modules/aws/eks_cluster"
   basename            = var.basename
   eks_subnets         = module.vpc.subnets_private
   eks_version         = var.eks_version
@@ -47,7 +57,7 @@ resource "aws_ami_copy" "amazon_encrypted_eks_node" {
 
 # EKS Node Group
 module "aws_eks_nodegroup" {
-  source                       = "../../modules/aws/eks_cluster/eks_nodegroup"
+  source                       = "./modules/aws/eks_cluster/eks_nodegroup"
   basename                     = var.basename
   bdm_ebs_encrypted            = false
   cluster_id                   = module.aws_eks_cluster.cluster_id
