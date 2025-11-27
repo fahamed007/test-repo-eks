@@ -14,11 +14,6 @@ variable "asg_scaledown" {
   description = "Cron string to set scaledown period"
   type        = string
 }
-variable "eks_node_ami_id" {
-  type        = string
-  description = "AMI ID for the EKS Node.  If this value is not specified, befault to latest EKS AMI ID.  May force replacement after node group has been created - so beware."
-  default     = ""
-}
 variable "bootstrap_extra_args" {
   type        = string
   description = "Additional arguments for bootstrap of nodegroup"
@@ -509,7 +504,7 @@ data "aws_ami" "amazon_eks_node" {
 
 # EKS AMI
 resource "aws_ami_copy" "amazon_encrypted_eks_node" {
-  description       = "A copy of ${startswith(local.eks_node_ami_id, "ami-") ? var.eks_node_ami_id : data.aws_ami.amazon_eks_node.id}"
+  description       = "A copy of ${startswith(var.eks_node_ami_id, "ami-") ? var.eks_node_ami_id : data.aws_ami.amazon_eks_node.id}"
   encrypted         = true
   name              = "${var.basename}-amazon-eks-node"
   source_ami_id     = startswith(var.eks_node_ami_id, "ami-") ? var.eks_node_ami_id : data.aws_ami.amazon_eks_node.id
@@ -584,7 +579,7 @@ USERDATA
 
 locals {
   asg_resources_to_tag = ["instance", "volume"]
-  cluster_id = aws_eks_cluster.cluster_id
+  cluster_id = aws_eks_cluster.aws_eks.id
   eks_subnets = [aws_subnet.public1.id, aws_subnet.public2.id, aws_subnet.private1.id, aws_subnet.private2.id]
   nodegroup_image_id = aws_ami_copy.amazon_encrypted_eks_node.id
   nodegroup_key_name = aws_key_pair.infra.id
