@@ -455,11 +455,6 @@ output "cluster_security_group_id" {
   description = "The id for the cluster security group"
 }
 
-output "eks_certificate_auth" {
-  value       = aws_eks_cluster.aws_eks.certificate_authority
-  description = "The cluster certificate authority"
-}
-
 output "eks_endpoint" {
   value       = aws_eks_cluster.aws_eks.endpoint
   description = "endpoint for the cluster"
@@ -563,12 +558,10 @@ locals {
   eks_endpoint = aws_eks_cluster.eks_endpoint
   nodegroup_userdata = var.bootstrap_extra_args
   nodegroup_security_group_ids = [aws_eks_cluster.cluster_security_group_id]
-  eks_certificate_auth = aws_eks_cluster.eks_certificate_auth[0].data
   bottlerocket_userdata = base64encode(templatefile("${path.module}/templates/bottlerocket_config.toml.tpl",
     {
       cluster_name                 = local.cluster_id
       cluster_endpoint             = var.eks_endpoint
-      cluster_ca_data              = var.eks_certificate_auth
       admin_container_enabled      = true
       admin_container_superpowered = true
       admin_container_source       = var.bottlerocket_admin_source
