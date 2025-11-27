@@ -10,7 +10,16 @@ variable "asg_scaledown" {
   description = "Cron string to set scaledown period"
   type        = string
 }
-
+variable "eks_node_ami_id" {
+  type        = string
+  description = "AMI ID for the EKS Node.  If this value is not specified, befault to latest EKS AMI ID.  May force replacement after node group has been created - so beware."
+  default     = ""
+}
+variable "bootstrap_extra_args" {
+  type        = string
+  description = "Additional arguments for bootstrap of nodegroup"
+  default     = "--use-max-pods false"
+}
 variable "asg_scaleup" {
   default     = "0 11 * * 1-5"
   description = "Cron string to set scaleup period"
