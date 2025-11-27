@@ -57,7 +57,7 @@ resource "aws_ami_copy" "amazon_encrypted_eks_node" {
 
 # EKS Node Group
 module "aws_eks_nodegroup" {
-  source                       = "./modules/aws/eks_cluster/eks_nodegroup"
+  source                       = "./modules/aws/eks_nodegroup"
   basename                     = var.basename
   bdm_ebs_encrypted            = false
   cluster_id                   = module.aws_eks_cluster.cluster_id

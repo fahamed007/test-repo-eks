@@ -485,31 +485,4 @@ output "node_group_role_id" {
   value       = aws_iam_role.eks_nodegroup_role.id
   description = "The node group role id"
 }
-## -----------------------------------------------------------------------
-## You will need to have a eks_cluster and an encrypted ami_copy already set up in order to use this module.
-## Please see eks_cluster and ami_encryption module within this repo
-## -----------------------------------------------------------------------
-resource "tls_private_key" "ssh" {
-  algorithm = "ED25519"
-}
-
-resource "aws_key_pair" "infra" {
-  key_name   = "test1_nodegroup_ssh_key"
-  public_key = tls_private_key.ssh.public_key_openssh
-}
-
-module "aws_eks_nodegroup" {
-  source                       = "REFER TO NOTE ON "source" lines ABOVE"
-  basename                     = "test1"
-  bdm_ebs_encrypted            = false
-  cluster_id                   = module.aws_eks_cluster.cluster_id
-  eks_certificate_auth         = module.aws_eks_cluster.eks_certificate_auth[0].data
-  eks_endpoint                 = module.aws_eks_cluster.eks_endpoint
-  eks_managed                  = true
-  eks_subnets                  = data.aws_subnet_ids.private_subnet_ids.ids
-  nodegroup_key_name           = aws_key_pair.infra.id
-  nodegroup_image_id           = aws_ami_copy.amazon_encrypted_eks_node.id
-  nodegroup_security_group_ids = [module.aws_eks_cluster.cluster_security_group_id]
-  nodegroup_userdata           = "--use-max-pods false"
-}
 
