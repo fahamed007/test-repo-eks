@@ -409,6 +409,35 @@ resource "aws_eks_cluster" "aws_eks" {
   ]
 }
 
+
+data "tls_certificate" "ekscert" {
+  url = aws_eks_cluster.aws_eks.identity[0].oidc[0].issuer
+}
+resource "aws_iam_openid_connect_provider" "open_connect_provider" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.ekscert.certificates[0].sha1_fingerprint]
+  url             = data.tls_certificate.ekscert.url
+}
+
+# sets the service account name to: "${var.basename}-aws-node"
+data "aws_iam_policy_document" "assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.open_connect_provider.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:kube-system:${var.basename}-aws-node"]
+    }
+
+    principals {
+      identifiers = [aws_iam_openid_connect_provider.open_connect_provider.arn]
+      type        = "Federated"
+    }
+  }
+}
+
 resource "aws_iam_role" "eks_role" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
   name               = "${var.basename}_eksrole"
