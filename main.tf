@@ -174,7 +174,8 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 data "aws_region" "current" {}
 
 resource "aws_iam_role" "eks_cluster" {
-  name = "${var.basename}-eks-cluster"
+  #name = "${var.basename}-eks-cluster"
+  name_prefix       = "${var.basename}-eks-" 
 
   assume_role_policy = <<POLICY
 {
@@ -621,7 +622,7 @@ resource "aws_launch_template" "nodegroup_launchtemplate" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = local.nodegroup_security_group_ids
+    security_groups             = [local.nodegroup_security_group_ids]
   }
 
   #user_data = var.enable_bottlerocket ? local.bottlerocket_userdata : data.cloudinit_config.userdata.rendered
