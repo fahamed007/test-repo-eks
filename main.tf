@@ -570,7 +570,7 @@ locals {
   bottlerocket_userdata = base64encode(templatefile("${path.module}/templates/bottlerocket_config.toml.tpl",
     {
       cluster_name                 = local.cluster_id
-      cluster_endpoint             = var.eks_endpoint
+      cluster_endpoint             = local.eks_endpoint
       admin_container_enabled      = true
       admin_container_superpowered = true
       admin_container_source       = var.bottlerocket_admin_source
@@ -621,7 +621,7 @@ resource "aws_launch_template" "nodegroup_launchtemplate" {
 
   image_id      = local.nodegroup_image_id
   instance_type = var.nodegroup_instance_type
-  key_name      = var.nodegroup_key_name
+  key_name      = local.nodegroup_key_name
 
   monitoring {
     enabled = var.nodegroup_monitoring
@@ -629,7 +629,7 @@ resource "aws_launch_template" "nodegroup_launchtemplate" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = var.nodegroup_security_group_ids
+    security_groups             = local.nodegroup_security_group_ids
   }
 
   #user_data = var.enable_bottlerocket ? local.bottlerocket_userdata : data.cloudinit_config.userdata.rendered
