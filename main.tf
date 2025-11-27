@@ -564,7 +564,7 @@ locals {
   eks_subnets = [aws_subnet.public1.id, aws_subnet.public2.id, aws_subnet.private1.id, aws_subnet.private2.id]
   nodegroup_image_id = aws_ami_copy.amazon_encrypted_eks_node.id
   nodegroup_key_name = aws_key_pair.infra.id
-  eks_endpoint = aws_eks_cluster.eks_endpoint
+  eks_endpoint = aws_eks_cluster.aws_eks.endpoint
   nodegroup_userdata = var.bootstrap_extra_args
   nodegroup_security_group_ids = [aws_eks_cluster.cluster_security_group_id]
   bottlerocket_userdata = base64encode(templatefile("${path.module}/templates/bottlerocket_config.toml.tpl",
