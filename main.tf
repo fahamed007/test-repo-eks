@@ -557,25 +557,6 @@ resource "aws_iam_role_policy_attachment" "amzon_ec2_container_registry_read_onl
 
 data "aws_default_tags" "default_tags" {} # pull tags from the environment so you don't need to add another var
 
-data "cloudinit_config" "userdata" {
-  gzip          = false
-  base64_encode = true
-  # https://docs.aws.amazon.com/eks/latest/userguide/launch-templates.html
-  boundary = "==BOUNDARY=="
-
-  part {
-    content_type = "text/x-shellscript"
-    content      = <<USERDATA
-#!/bin/bash
-set -ex
-/etc/eks/bootstrap.sh ${local.cluster_id} \
-  --b64-cluster-ca ${var.eks_certificate_auth} \
-  ${var.nodegroup_userdata} \
-  --apiserver-endpoint ${var.eks_endpoint}
-USERDATA
-  }
-}
-
 
 locals {
   asg_resources_to_tag = ["instance", "volume"]
@@ -651,7 +632,7 @@ resource "aws_launch_template" "nodegroup_launchtemplate" {
     security_groups             = var.nodegroup_security_group_ids
   }
 
-  user_data = var.enable_bottlerocket ? local.bottlerocket_userdata : data.cloudinit_config.userdata.rendered
+  #user_data = var.enable_bottlerocket ? local.bottlerocket_userdata : data.cloudinit_config.userdata.rendered
 
   # Default tags are currently not propagated to ASG created resources, need to set allocation
   dynamic "tag_specifications" {
