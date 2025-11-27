@@ -566,15 +566,7 @@ locals {
   nodegroup_key_name = aws_key_pair.infra.id
   eks_endpoint = aws_eks_cluster.aws_eks.endpoint
   nodegroup_userdata = var.bootstrap_extra_args
-  nodegroup_security_group_ids = [aws_eks_cluster.cluster_security_group_id]
-  bottlerocket_userdata = base64encode(templatefile("${path.module}/templates/bottlerocket_config.toml.tpl",
-    {
-      cluster_name                 = local.cluster_id
-      cluster_endpoint             = local.eks_endpoint
-      admin_container_enabled      = true
-      admin_container_superpowered = true
-      admin_container_source       = var.bottlerocket_admin_source
-  }))
+  nodegroup_security_group_ids = aws_eks_cluster.aws_eks.vpc_config[0].cluster_security_group_id
 }
 
 data "aws_ami" "nodegroup_ami" {
@@ -664,7 +656,7 @@ resource "aws_eks_node_group" "node_group" {
   cluster_name         = local.cluster_id
   node_group_name      = "${var.basename}_node_group"
   node_role_arn        = aws_iam_role.eks_nodegroup_role.arn
-  subnet_ids           = var.eks_subnets
+  subnet_ids           = local.eks_subnets
   force_update_version = var.force_update_version
 
   launch_template {
@@ -751,7 +743,7 @@ resource "aws_autoscaling_group" "unmanaged_nodegroup" {
   desired_capacity    = var.nodegroup_desired
   max_size            = var.nodegroup_max
   min_size            = var.nodegroup_min
-  vpc_zone_identifier = var.eks_subnets
+  vpc_zone_identifier = local.eks_subnets
 
   launch_template {
     id      = aws_launch_template.nodegroup_launchtemplate.id
