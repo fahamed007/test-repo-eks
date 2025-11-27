@@ -5,6 +5,138 @@ variable "basename" {
   default = "firoj"
 }
 
+variable "asg_scaledown" {
+  default     = "0 22 * * 1-5"
+  description = "Cron string to set scaledown period"
+  type        = string
+}
+
+variable "asg_scaleup" {
+  default     = "0 11 * * 1-5"
+  description = "Cron string to set scaleup period"
+  type        = string
+}
+
+
+variable "eks_version" {
+  default     = 1.32
+  description = "EKS version"
+  type        = number
+}
+
+
+
+variable "bdm_ebs_encrypted" {
+  default     = false
+  description = "Whether the ebs volume should be encrypted"
+  type        = bool
+}
+
+variable "bdm_ebs_kms_key_id" {
+  default     = null
+  description = "kms key id to encrypt ebs"
+  type        = string
+}
+
+
+variable "eks_managed" {
+  default     = true
+  description = "switch to setup eks_managed resource or not"
+  type        = bool
+}
+
+variable "eks_schedule" {
+  default     = false
+  description = "switch to setup eks_managed weekday schedule"
+  type        = bool
+}
+
+
+variable "force_update_version" {
+  default     = false
+  description = "Force version update if existing pods are unable to be drained due to a pod disruption budget issue."
+  type        = bool
+}
+
+
+variable "http_put_response_hop_limit" {
+  description = "The hop limit essentially restricts how far metadata requests can travel, enhancing security by limiting potential exposure."
+  default     = 2
+  type        = number
+}
+
+variable "nodegroup_desired" {
+  default     = "1"
+  description = "node group desired size"
+  type        = string
+}
+
+
+variable "nodegroup_instance_type" {
+  default     = "t3.medium"
+  description = "instance type to use for eks node group"
+  type        = string
+}
+
+
+variable "nodegroup_labels" {
+  default     = {}
+  description = "Key-value map of Node Group Labels"
+  type        = map(string)
+}
+
+variable "nodegroup_max" {
+  default     = "3"
+  description = "node group max size"
+  type        = string
+}
+
+
+variable "nodegroup_min" {
+  default     = "1"
+  description = "node group min size"
+  type        = string
+}
+
+variable "nodegroup_monitoring" {
+  default     = false
+  description = "whether to enable advanced monitoring"
+  type        = bool
+}
+
+
+
+
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
+  default     = {}
+}
+
+variable "nodegroup_taints" {
+  default     = []
+  description = "taints for the nodes within nodegroup"
+  type = list(object({
+    key    = string
+    value  = string
+    effect = string
+  }))
+}
+
+
+variable "enable_bottlerocket" {
+  description = "Use bottle rocket user data"
+  type        = bool
+  default     = false
+}
+
+variable "bottlerocket_admin_source" {
+  description = "source for bottlerocket admin"
+  type        = string
+  default     = ""
+}
+
+
 
 variable "aws_region" {
   type        = string
@@ -348,135 +480,6 @@ resource "aws_ami_copy" "amazon_encrypted_eks_node" {
 }
 
 
-variable "asg_scaledown" {
-  default     = "0 22 * * 1-5"
-  description = "Cron string to set scaledown period"
-  type        = string
-}
-
-variable "asg_scaleup" {
-  default     = "0 11 * * 1-5"
-  description = "Cron string to set scaleup period"
-  type        = string
-}
-
-
-variable "eks_version" {
-  default     = 1.32
-  description = "EKS version"
-  type        = number
-}
-
-
-
-variable "bdm_ebs_encrypted" {
-  default     = false
-  description = "Whether the ebs volume should be encrypted"
-  type        = bool
-}
-
-variable "bdm_ebs_kms_key_id" {
-  default     = null
-  description = "kms key id to encrypt ebs"
-  type        = string
-}
-
-
-variable "eks_managed" {
-  default     = true
-  description = "switch to setup eks_managed resource or not"
-  type        = bool
-}
-
-variable "eks_schedule" {
-  default     = false
-  description = "switch to setup eks_managed weekday schedule"
-  type        = bool
-}
-
-
-variable "force_update_version" {
-  default     = false
-  description = "Force version update if existing pods are unable to be drained due to a pod disruption budget issue."
-  type        = bool
-}
-
-
-variable "http_put_response_hop_limit" {
-  description = "The hop limit essentially restricts how far metadata requests can travel, enhancing security by limiting potential exposure."
-  default     = 2
-  type        = number
-}
-
-variable "nodegroup_desired" {
-  default     = "1"
-  description = "node group desired size"
-  type        = string
-}
-
-
-variable "nodegroup_instance_type" {
-  default     = "t3.medium"
-  description = "instance type to use for eks node group"
-  type        = string
-}
-
-
-variable "nodegroup_labels" {
-  default     = {}
-  description = "Key-value map of Node Group Labels"
-  type        = map(string)
-}
-
-variable "nodegroup_max" {
-  default     = "3"
-  description = "node group max size"
-  type        = string
-}
-
-
-variable "nodegroup_min" {
-  default     = "1"
-  description = "node group min size"
-  type        = string
-}
-
-variable "nodegroup_monitoring" {
-  default     = false
-  description = "whether to enable advanced monitoring"
-  type        = bool
-}
-
-#variable "nodegroup_security_group_ids" {
-#default     = []
-#description = "list of security groups"
-#type        = list(any)
-#default     = [module.aws_eks_cluster.cluster_security_group_id]
-#}
-
-#variable "nodegroup_userdata" {
-#default     = var.bootstrap_extra_args
-#description = "user data for the instances within nodegroup"
-#type        = string
-#}
-
-variable "nodegroup_taints" {
-  default     = []
-  description = "taints for the nodes within nodegroup"
-  type = list(object({
-    key    = string
-    value  = string
-    effect = string
-  }))
-}
-
-
-
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  type        = map(string)
-  default     = {}
-}
 /**
  * # Module aws_eks_nodegroup
  *
@@ -541,17 +544,6 @@ USERDATA
   }
 }
 
-variable "enable_bottlerocket" {
-  description = "Use bottle rocket user data"
-  type        = bool
-  default     = false
-}
-
-variable "bottlerocket_admin_source" {
-  description = "source for bottlerocket admin"
-  type        = string
-  default     = ""
-}
 
 locals {
   asg_resources_to_tag = ["instance", "volume"]
